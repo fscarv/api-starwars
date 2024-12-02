@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static com.scarv.starwars.common.PlanetConstante.PLANET;
 import static com.scarv.starwars.common.PlanetConstante.INVALID_PLANET;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,5 +39,25 @@ class PlanetServiceTest {
     when(planetRepository.save(INVALID_PLANET)).thenThrow(RuntimeException.class);
 
     assertThatThrownBy(() -> planetService.create(INVALID_PLANET)).isInstanceOf(RuntimeException.class);
+  }
+
+  @Test
+  void getPlanet_ByExistingId_ReturnsPlanet(){
+    when(planetRepository.findById(1L)).thenReturn(Optional.of(PLANET));
+
+    Optional<Planet> sut = planetService.get(1L);
+
+    assertThat(sut).isNotEmpty();
+    assertThat(sut.get()).isEqualTo(PLANET);
+  }
+
+  @Test
+  void getPlanet_ByUnexistingId_ReturnsEmpty(){
+    when(planetRepository.findById(1L)).thenReturn(Optional.empty());
+
+    Optional<Planet> sut = planetService.get(1L);
+
+    assertThat(sut).isEmpty();
+
   }
 }

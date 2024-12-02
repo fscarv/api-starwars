@@ -4,10 +4,7 @@ import com.scarv.starwars.domain.Planet;
 import com.scarv.starwars.service.PlanetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/planets")
@@ -23,5 +20,10 @@ public class PlanetController {
   public ResponseEntity<Planet> createPlanet(@RequestBody Planet planet) {
     Planet planetCreated = planetService.create(planet);
     return ResponseEntity.status(HttpStatus.CREATED).body(planetCreated);
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<Planet> getPlanetById(@PathVariable Long id) {
+    return planetService.get(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 }
