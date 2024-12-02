@@ -1,19 +1,25 @@
 package com.scarv.starwars.service;
 
 import com.scarv.starwars.domain.Planet;
+import com.scarv.starwars.domain.QueryBuilder;
 import com.scarv.starwars.repository.PlanetRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Example;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static com.scarv.starwars.common.PlanetConstante.PLANET;
 import static com.scarv.starwars.common.PlanetConstante.INVALID_PLANET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -75,6 +81,31 @@ class PlanetServiceTest {
     when(planetRepository.findByName(INVALID_PLANET.getName())).thenReturn(Optional.empty());
 
     Optional<Planet> sut = planetService.getByName(INVALID_PLANET.getName());
+
+    assertThat(sut).isEmpty();
+  }
+
+  @Test
+  void listPlanets_ReturnsAllPlanets(){
+    List<Planet> planets = new ArrayList<>() {{
+      add(PLANET);
+    }};
+
+    Example<Planet> query = QueryBuilder.makeQuery(new Planet(PLANET.getTerrain(), PLANET.getClimate()));
+    when(planetRepository.findAll(query)).thenReturn(planets);
+
+    List<Planet> sut = planetService.list(PLANET.getTerrain(), PLANET.getClimate());
+
+    assertThat(sut).isNotEmpty();
+    assertThat(sut).hasSize(1);
+    assertThat(sut.get(0)).isEqualTo(PLANET);
+  }
+
+  @Test
+  void listPlanets_ReturnsNoPlanets(){
+    when(planetRepository.findAll(any())).thenReturn(Collections.emptyList());
+
+    List<Planet> sut = planetService.list(PLANET.getTerrain(), PLANET.getClimate());
 
     assertThat(sut).isEmpty();
   }
