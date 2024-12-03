@@ -1,10 +1,14 @@
 package com.scarv.starwars.repository;
 
 import com.scarv.starwars.domain.Planet;
+import org.h2.table.Plan;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+
+import java.util.Optional;
 
 import static com.scarv.starwars.common.PlanetConstante.PLANET;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,6 +22,11 @@ public class PlanetRepositoryTest {
 
   @Autowired
   private TestEntityManager entityManager;
+
+  @AfterEach
+  public void afterEach() {
+    PLANET.setId(null);
+  }
 
   @Test
   void createPlanet_WithValidData_ReturnsPlanet(){
@@ -47,5 +56,22 @@ public class PlanetRepositoryTest {
     planet.setId(null);
 
     assertThatThrownBy(() -> planetRepository.save(planet)).isInstanceOf(RuntimeException.class);
+  }
+
+  @Test
+  void getPlanet_ByExistingId_ReturnsPlanet() {
+    Planet planet = entityManager.persistFlushFind(PLANET);
+
+    Optional<Planet> planetOptional = planetRepository.findById(planet.getId());
+
+    assertThat(planetOptional).isNotEmpty();
+    assertThat(planetOptional.get()).isEqualTo(planet);
+  }
+
+  @Test
+  void getPlanet_ByUnexistingId_ReturnsEmpty() {
+    Optional<Planet> planetOptional = planetRepository.findById(1L);
+
+    assertThat(planetOptional).isEmpty();
   }
 }
