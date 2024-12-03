@@ -20,7 +20,7 @@ import static com.scarv.starwars.common.PlanetConstante.INVALID_PLANET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PlanetServiceTest {
@@ -108,5 +108,21 @@ class PlanetServiceTest {
     List<Planet> sut = planetService.list(PLANET.getTerrain(), PLANET.getClimate());
 
     assertThat(sut).isEmpty();
+  }
+
+  @Test
+  void removePlanet_WithExistingId_doesNotThrowException(){
+    doNothing().when(planetRepository).deleteById(1L);
+
+    planetService.remove(1L);
+
+    verify(planetRepository, times(1)).deleteById(1L);
+  }
+
+  @Test
+  void removePlanet_WithUnexistingId_throwsException(){
+    doThrow(RuntimeException.class).when(planetRepository).deleteById(100L);
+
+    assertThatThrownBy(() -> planetService.remove(100L)).isInstanceOf(RuntimeException.class);
   }
 }

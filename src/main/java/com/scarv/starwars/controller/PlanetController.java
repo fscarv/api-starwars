@@ -39,4 +39,10 @@ public class PlanetController {
                                               @RequestParam(required = false) String climate) {
     return ResponseEntity.ok(planetService.list(terrain, climate));
   }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> remove(@PathVariable("id") Long id) {
+    planetService.remove(id);
+    return ResponseEntity.noContent().build();
+  }
 }
