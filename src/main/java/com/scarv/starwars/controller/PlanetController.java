@@ -2,6 +2,7 @@ package com.scarv.starwars.controller;
 
 import com.scarv.starwars.domain.Planet;
 import com.scarv.starwars.service.PlanetService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class PlanetController {
   }
 
   @PostMapping
-  public ResponseEntity<Planet> createPlanet(@RequestBody Planet planet) {
+  public ResponseEntity<Planet> createPlanet(@RequestBody @Valid Planet planet) {
     Planet planetCreated = planetService.create(planet);
     return ResponseEntity.status(HttpStatus.CREATED).body(planetCreated);
   }
